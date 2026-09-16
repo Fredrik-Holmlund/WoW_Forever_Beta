@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forever Talents</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Forever Talents <span class="subtitle">— heuristisk talent-guide (WoW Forever, preliminär data)</span></h1>
+  <p class="disclaimer">
+    Poäng/rekommendationer kommer från en grov, textbaserad heuristik
+    (se <code>scoring/scorer.py</code>) — inte en riktig simulering.
+    Talangdatan är preliminär till spelet släpps.
+  </p>
+</header>
+
+<main>
+  <div id="loading">Laddar data...</div>
+  <div id="app" class="hidden">
+    <section class="controls">
+      <label>
+        Klass
+        <select id="class-select"></select>
+      </label>
+      <label>
+        Spec
+        <select id="spec-select"></select>
+      </label>
+      <label class="points-control">
+        Föreslagen build för
+        <input type="range" id="points-slider" min="0" max="51" value="31">
+        <input type="number" id="points-number" min="0" max="51" value="31">
+        poäng
+      </label>
+      <label class="checkbox-control">
+        <input type="checkbox" id="highlight-toggle" checked>
+        Markera föreslagen build
+      </label>
+    </section>
+
+    <section class="summary" id="summary"></section>
+
+    <section class="legend">
+      <span>Färg = talangens värde (heuristik):</span>
+      <div class="legend-gradient"></div>
+      <span class="legend-labels"><span>lågt</span><span>högt</span></span>
+      <span class="legend-note">Ring = föreslagen rank &gt; 0 vid vald poängsumma.</span>
+    </section>
+
+    <section id="tree" class="tree"></section>
+  </div>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
