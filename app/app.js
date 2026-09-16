@@ -3,11 +3,11 @@
 // renders all 3 specs of the selected class side by side, like the real
 // in-game / Wowhead calculator.
 //
-// Talent icons load from app/icons/<slug>.jpg. That folder is NOT checked
-// in (this sandbox's network policy blocks wowhead.com/zamimg.com, so the
-// icons couldn't be fetched here) -- run data/fetch_talent_icons.py
-// locally to populate it. Until then every talent falls back to a
-// monogram tile, which is why "icon-img" has an onerror handler below.
+// Talent icons load from app/icons/<slug>.jpg (checked in). If new talents
+// are added later and their icons are missing, re-run
+// data/fetch_talent_icons.py -- any talent without a matching file just
+// falls back to a monogram tile, which is why "icon-img" has an onerror
+// handler below.
 
 const DATA_URL = "data/scored.json";
 const TOTAL_POINTS = 51;

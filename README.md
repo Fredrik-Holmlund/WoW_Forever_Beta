@@ -94,24 +94,28 @@ python3 scoring/generate_scored_data.py     # skriver app/data/scored.json
 python3 data/fetch_talent_icons.py          # hämtar talang-ikoner till app/icons/ (kräver nätåtkomst)
 ```
 
-`fetch_talent_icons.py` kunde inte köras i den sandboxade miljön det här
-projektet byggdes i — dess nätverkspolicy blockerar både `wowhead.com` och
-ikon-CDN:et `wow.zamimg.com` (testat direkt, inte bara antaget). Kör den
-själv lokalt där du har vanlig internetåtkomst, och committa in resultatet:
+Alla 362 ikoner som nuvarande talangdata refererar finns redan i `app/icons/`
+och är incheckade, så UI:t fungerar direkt för alla som klonar repot — ingen
+behöver köra scriptet själva bara för att se ikoner. `fetch_talent_icons.py`
+kunde inte köras i den sandboxade miljön det här projektet byggdes i (dess
+nätverkspolicy blockerar både `wowhead.com` och ikon-CDN:et
+`wow.zamimg.com`, testat direkt); ikonerna som ligger incheckade hämtades
+lokalt och lades till manuellt istället.
+
+Kör om scriptet och committa in nya filer bara om talangdata uppdateras med
+nya talanger (nya ikon-slugs som saknas i `app/icons/`):
 
 ```bash
 python3 data/fetch_talent_icons.py
 git add app/icons
-git commit -m "Add talent icons"
+git commit -m "Update talent icons"
 git push
 ```
 
-Ikonerna checkas in (de är inte gitignorade) så UI:t fungerar direkt för
-alla som klonar repot, utan att behöva köra scriptet själva. Notera att det
-är Blizzards spelgrafik, inte din egen — vanlig praxis för fan-verktyg,
-men värt att känna till om du gör repot publikt. Om en enskild ikon saknas
-eller har fel filnamn visar UI:t en bokstavsplatshållare istället — inget
-kraschar, det ser bara mindre snyggt ut.
+Notera att ikonerna är Blizzards spelgrafik, inte din egen — vanlig praxis
+för fan-verktyg, men värt att känna till om du gör repot publikt. Om en
+enskild ikon saknas eller har fel filnamn visar UI:t en bokstavsplatshållare
+istället — inget kraschar, det ser bara mindre snyggt ut.
 
 ## Köra UI:t
 
