@@ -9,6 +9,7 @@ else in this script, or in the UI, needs to change.
 """
 import json
 import sys
+from dataclasses import asdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -41,6 +42,7 @@ def main() -> None:
                             "per_rank_values": score.per_rank_values,
                             "total_value": score.total_value,
                             "rationale": score.rationale,
+                            "breakdown": [asdict(c) for c in score.breakdown],
                         },
                     }
                 )

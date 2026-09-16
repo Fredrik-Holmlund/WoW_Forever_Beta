@@ -445,6 +445,65 @@ main {
   font-size: 0.78rem;
 }
 
+.explain-panel {
+  margin-top: 0.75rem;
+  background: var(--panel);
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.8rem;
+  min-height: 3.5rem;
+}
+
+.explain-placeholder {
+  color: var(--muted);
+}
+
+.explain-head {
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+.explain-head b { color: var(--accent); }
+
+.explain-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.explain-table td {
+  padding: 0.2rem 0.5rem 0.2rem 0;
+  vertical-align: top;
+  border-bottom: 1px solid #23262e;
+}
+
+.eb-label {
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.eb-matched {
+  color: #c9d8b0;
+  font-style: italic;
+}
+
+.eb-math {
+  color: var(--text);
+  white-space: nowrap;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.eb-math b { color: var(--accent); }
+
+.explain-foot {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.explain-foot b { color: var(--text); }
+
 .wh-tooltip {
   position: fixed;
   display: none;

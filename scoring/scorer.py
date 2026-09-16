@@ -20,8 +20,19 @@ they matter" signal until real sim data exists, not a min-max answer.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Protocol
+
+
+@dataclass(frozen=True)
+class ScoreComponent:
+    """One matched piece of a talent's tooltip text that contributed to its score."""
+
+    label: str  # human-readable category, e.g. "Skada/heal %"
+    matched_text: str  # the substring that matched (or a snippet, for baseline fallbacks)
+    value: float  # the raw parsed number (or 1 for a flat baseline)
+    weight: float  # weight applied to `value`
+    contribution: float  # value * weight, rounded
 
 
 @dataclass(frozen=True)
@@ -37,6 +48,9 @@ class TalentScore:
     total_value: float
     # short human-readable explanation of how the score was derived.
     rationale: str
+    # WHY total_value is what it is: every matched component of the max-rank
+    # tooltip text, so the UI can show its work instead of just a number.
+    breakdown: list[ScoreComponent]
 
 
 class Scorer(Protocol):
@@ -77,51 +91,90 @@ CAPSTONE_ROW = 6
 _STAT_NAMES = r"(?:Strength|Agility|Intellect|Spirit|Stamina|Attack Power|Spell Power|Armor)"
 
 # Ordered (most specific first) so a "damage by X%" match isn't also double
-# counted by the generic percent fallback.
-_PATTERNS: list[tuple[re.Pattern[str], float]] = [
-    (re.compile(r"(?:damage|healing)[^.%]*?by (\d+(?:\.\d+)?)%", re.I), WEIGHT_DAMAGE_OR_HEAL_PCT),
-    (re.compile(r"critical strike chance[^.%]*?by (\d+(?:\.\d+)?)%", re.I), WEIGHT_CRIT_PCT),
-    (re.compile(r"(\d+(?:\.\d+)?)% chance", re.I), WEIGHT_PROC_CHANCE_PCT),
-    (re.compile(r"(?:reduces?|decreases?)[^.%]*?cost[^.%]*?by (\d+(?:\.\d+)?)%", re.I), WEIGHT_COST_REDUCTION_PCT),
-    (re.compile(r"threat[^.%]*?by (\d+(?:\.\d+)?)%", re.I), WEIGHT_THREAT_PCT),
-    (re.compile(r"cooldown[^.]*?by (\d+(?:\.\d+)?) sec", re.I), WEIGHT_COOLDOWN_SEC),
-    (re.compile(r"cast(?:ing)? time[^.]*?by (\d+(?:\.\d+)?) sec", re.I), WEIGHT_CAST_TIME_SEC),
-    (re.compile(r"range[^.]*?by (\d+(?:\.\d+)?) yard", re.I), WEIGHT_RANGE_YARDS),
-    (re.compile(rf"by (\d+(?:\.\d+)?) {_STAT_NAMES}", re.I), WEIGHT_FLAT_STAT),
-    (re.compile(r"resistance[^.]*?by (\d+(?:\.\d+)?)", re.I), WEIGHT_RESISTANCE),
-    (re.compile(r"by (\d+(?:\.\d+)?)%", re.I), WEIGHT_GENERIC_PCT),
+# counted by the generic percent fallback. Each entry is (pattern, weight,
+# human-readable label) -- the label is only for the breakdown/explanation,
+# it doesn't affect scoring.
+_PATTERNS: list[tuple[re.Pattern[str], float, str]] = [
+    (re.compile(r"(?:damage|healing)[^.%]*?by (\d+(?:\.\d+)?)%", re.I), WEIGHT_DAMAGE_OR_HEAL_PCT, "Skada/heal %"),
+    (re.compile(r"critical strike chance[^.%]*?by (\d+(?:\.\d+)?)%", re.I), WEIGHT_CRIT_PCT, "Kritisk träffchans %"),
+    (re.compile(r"(\d+(?:\.\d+)?)% chance", re.I), WEIGHT_PROC_CHANCE_PCT, "Procchans %"),
+    (re.compile(r"(?:reduces?|decreases?)[^.%]*?cost[^.%]*?by (\d+(?:\.\d+)?)%", re.I), WEIGHT_COST_REDUCTION_PCT, "Resurskostnad -%"),
+    (re.compile(r"threat[^.%]*?by (\d+(?:\.\d+)?)%", re.I), WEIGHT_THREAT_PCT, "Threat %"),
+    (re.compile(r"cooldown[^.]*?by (\d+(?:\.\d+)?) sec", re.I), WEIGHT_COOLDOWN_SEC, "Cooldown-reduktion (sek)"),
+    (re.compile(r"cast(?:ing)? time[^.]*?by (\d+(?:\.\d+)?) sec", re.I), WEIGHT_CAST_TIME_SEC, "Casttid-reduktion (sek)"),
+    (re.compile(r"range[^.]*?by (\d+(?:\.\d+)?) yard", re.I), WEIGHT_RANGE_YARDS, "Räckvidd (yards)"),
+    (re.compile(rf"by (\d+(?:\.\d+)?) {_STAT_NAMES}", re.I), WEIGHT_FLAT_STAT, "Flat statökning"),
+    (re.compile(r"resistance[^.]*?by (\d+(?:\.\d+)?)", re.I), WEIGHT_RESISTANCE, "Resistance"),
+    (re.compile(r"by (\d+(?:\.\d+)?)%", re.I), WEIGHT_GENERIC_PCT, "Övrig procentsats"),
 ]
 _ANY_NUMBER = re.compile(r"(\d+(?:\.\d+)?)")
 
 
-def _magnitude(text: str, *, row: int, max_rank: int) -> float:
-    """Rough "how much does this tooltip text matter" score."""
+def _magnitude_breakdown(text: str, *, row: int, max_rank: int) -> tuple[float, list[ScoreComponent]]:
+    """
+    Rough "how much does this tooltip text matter" score, plus the list of
+    matched components that produced it -- this IS the "why" the UI shows.
+    """
     if not text:
-        return 0.0
+        return 0.0, []
 
     matched_spans: list[tuple[int, int]] = []
-    total = 0.0
-    for pattern, weight in _PATTERNS:
+    components: list[ScoreComponent] = []
+    for pattern, weight, label in _PATTERNS:
         for m in pattern.finditer(text):
             span = m.span(1)
             if any(a < span[1] and span[0] < b for a, b in matched_spans):
                 continue  # already counted by a more specific pattern
             matched_spans.append(span)
-            total += float(m.group(1)) * weight
+            value = float(m.group(1))
+            components.append(
+                ScoreComponent(
+                    label=label,
+                    matched_text=m.group(0),
+                    value=value,
+                    weight=weight,
+                    contribution=round(value * weight, 3),
+                )
+            )
 
+    total = round(sum(c.contribution for c in components), 3)
     if total > 0:
-        return total
+        return total, components
 
     # No categorized number matched -- fall back to any bare number (e.g. a
     # flat damage value like "155 to 185 Fire damage") at low weight, or a
     # flat qualitative baseline if there's no number at all.
     any_numbers = _ANY_NUMBER.findall(text)
     if any_numbers:
-        return sum(float(n) for n in any_numbers) * WEIGHT_UNMATCHED_FLAT_NUMBER
+        raw = sum(float(n) for n in any_numbers)
+        contribution = round(raw * WEIGHT_UNMATCHED_FLAT_NUMBER, 3)
+        component = ScoreComponent(
+            label="Otolkad siffra (låg vikt)",
+            matched_text=text,
+            value=raw,
+            weight=WEIGHT_UNMATCHED_FLAT_NUMBER,
+            contribution=contribution,
+        )
+        return contribution, [component]
 
     if row >= CAPSTONE_ROW and max_rank == 1:
-        return BASELINE_CAPSTONE
-    return BASELINE_QUALITATIVE
+        component = ScoreComponent(
+            label="Baseline: kapstensförmåga (sista raden, 1 rank)",
+            matched_text=text,
+            value=1.0,
+            weight=BASELINE_CAPSTONE,
+            contribution=BASELINE_CAPSTONE,
+        )
+        return BASELINE_CAPSTONE, [component]
+
+    component = ScoreComponent(
+        label="Baseline: kvalitativ effekt (ingen tolkningsbar siffra hittad)",
+        matched_text=text,
+        value=1.0,
+        weight=BASELINE_QUALITATIVE,
+        contribution=BASELINE_QUALITATIVE,
+    )
+    return BASELINE_QUALITATIVE, [component]
 
 
 @dataclass
@@ -134,9 +187,13 @@ class HeuristicScorer:
         row = talent["row"]
 
         magnitudes = [0.0]  # magnitude(rank=0) == 0
+        max_rank_breakdown: list[ScoreComponent] = []
         for rank in range(1, max_rank + 1):
             text = descriptions.get(str(rank), "")
-            magnitudes.append(_magnitude(text, row=row, max_rank=max_rank))
+            value, breakdown = _magnitude_breakdown(text, row=row, max_rank=max_rank)
+            magnitudes.append(value)
+            if rank == max_rank:
+                max_rank_breakdown = breakdown
 
         per_rank_values = []
         for rank in range(1, max_rank + 1):
@@ -157,4 +214,5 @@ class HeuristicScorer:
             per_rank_values=per_rank_values,
             total_value=total_value,
             rationale=rationale,
+            breakdown=max_rank_breakdown,
         )

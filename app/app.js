@@ -344,6 +344,43 @@ function refreshHoveredTooltip() {
 function hideTooltip() {
   hoveredTalent = null;
   if (tooltipEl) tooltipEl.style.display = "none";
+  renderExplainPanel(null);
+}
+
+// Panel under the trees explaining WHY a talent's heuristic score is what
+// it is: every matched piece of its max-rank tooltip text, the weight
+// applied, and its contribution -- the same breakdown data the Python
+// scorer computed, just rendered instead of collapsed into one number.
+function renderExplainPanel(talent) {
+  const panel = document.getElementById("explain-panel");
+  if (!talent) {
+    panel.innerHTML =
+      '<div class="explain-placeholder">Hovra över en talang för att se varför den har sitt heuristiska värde.</div>';
+    return;
+  }
+  const breakdown = talent.score.breakdown || [];
+  const rows = breakdown
+    .map(
+      (c) => `
+      <tr>
+        <td class="eb-label">${escapeHtml(c.label)}</td>
+        <td class="eb-matched">"${escapeHtml(c.matched_text)}"</td>
+        <td class="eb-math">${c.value} × ${c.weight} = <b>${c.contribution}</b></td>
+      </tr>`
+    )
+    .join("");
+  const rawMagnitude = Math.round(breakdown.reduce((sum, c) => sum + c.contribution, 0) * 100) / 100;
+
+  panel.innerHTML = `
+    <div class="explain-head">Varför <b>${escapeHtml(talent.name)}</b> har det heuristiska värdet den har (baserat på rank ${talent.max_rank}-texten):</div>
+    <table class="explain-table"><tbody>${rows}</tbody></table>
+    <div class="explain-foot">
+      Rå tolkad magnitud vid max rank: <b>${rawMagnitude}</b>. Detta fördelas över
+      talangens ${talent.max_rank} rank(er) (varje rank golvas till minst 0.1 så DP:n
+      alltid har ett skäl att överväga poängen) — totalt heuristiskt värde:
+      <b>${talent.score.total_value}</b>.
+    </div>
+  `;
 }
 
 function render() {
@@ -482,6 +519,7 @@ function renderTreePanel(cls, specName, tree, showScore) {
       lastMouseX = e.clientX;
       lastMouseY = e.clientY;
       showTooltipAt(buildTooltipHTML(t, ranks[t.id] || 0, treeTalents, ranks), e.clientX, e.clientY);
+      renderExplainPanel(t);
     });
     node.addEventListener("mousemove", (e) => {
       lastMouseX = e.clientX;
