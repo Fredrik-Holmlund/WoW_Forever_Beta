@@ -154,15 +154,30 @@ Se `scoring/scorer.py` för fullständig dokumentation. Kort sammanfattning:
   Efter release, byt ut `HeuristicScorer` mot t.ex. en `SimcScorer` som
   läser riktiga DPS/HPS-resultat från SimulationCraft, kör om
   `generate_scored_data.py`, och resten av appen behöver inte ändras.
+- Varje matchad textbit i en talangs tooltip (t.ex. "skada +5%", "Stamina
+  +10") sparas som en `ScoreComponent` med etikett, matchad text, vikt och
+  bidrag — det är detta som driver "varför"-panelen under träden i UI:t.
+- **DPS/Survival/Healing-dimensioner**: varje `ScoreComponent` taggas också
+  med en dimension (`dps` / `survival` / `healing` / `neutral`) baserat på
+  nyckelord i mönstret eller den omgivande texten (t.ex. skada/kritisk
+  träffchans → DPS, Stamina/Armor/resistance/threat → Survival,
+  Spirit/Intellect/Spell Power eller "heal" i texten → Healing). Komponenter
+  som inte går att placera tydligt (`neutral`, t.ex. resurskostnad, räckvidd,
+  otolkade baseline-fall) räknas till **alla tre** dimensioner men bara med
+  40 % vikt, så rena utility-talanger inte försvinner helt i en
+  specialiserad build utan heller dominerar den. Det här är den mest
+  osäkra delen av heuristiken — se `scoring/scorer.py` för hela
+  klassificeringslogiken.
 
 `scoring/builder.py` löser "bästa build för N poäng" som ett rad-för-rad
 grupperat knapsack-DP: talangträdet är litet (max 7 rader × 4 kolumner,
 51 poäng), så brute-force/DP per rad är fullt tillräckligt snabbt. Den
 respekterar både rad-låset (rad *r* kräver ≥5*r* investerade poäng i
 trädet) och `requires`-fältet (specifik talang måste ha ≥ N ranks innan en
-beroende talang kan få poäng). Verifierad mot alla 27 träd: poängbudget,
-rad-lås, prerequisites och att värdet aldrig minskar när budgeten ökar
-håller för samtliga.
+beroende talang kan få poäng). Verifierad mot alla 27 träd × alla 4
+scoring-varianter (generell/DPS/Survival/Healing) = 108 kombinationer:
+poängbudget, rad-lås, prerequisites och att värdet aldrig minskar när
+budgeten ökar håller för samtliga.
 
 ## UI:t i korthet
 
@@ -173,7 +188,15 @@ håller för samtliga.
   och ev. prerequisites.
 - Ikoner laddas från `app/icons/<slug>.jpg` med en bokstavsplatshållare
   som fallback (se ovan om varför de inte är checkade in).
+- Varje trädfot har fyra "fyll automatiskt"-knappar (**Bäst / DPS / Surv /
+  Heal**) som fyller trädet enligt respektive scoring-dimension upp till
+  antal poäng angivet i fältet bredvid.
+- Panelen under träden ("varför har den det värdet") visar samma
+  dimensionstaggning per matchad textbit, plus en sammanfattning av
+  talangens DPS/Survival/Healing-totaler.
 - Testat manuellt med en headless-browser-smoke test (Playwright mot den
   förinstallerade Chromium-instansen): klick/högerklick, cascade-borttagning
-  av beroende talanger, "Fyll automatiskt", Reset och score-togglen
-  verifierades alla fungera utan konsol-/sidfel.
+  av beroende talanger, alla fyra "fyll automatiskt"-knapparna, Reset och
+  score-togglen verifierades alla fungera utan konsol-/sidfel. Stickprov
+  (Warrior/Fury) visar att DPS- och Survival-fyllningen faktiskt väljer
+  olika talanger när trädet har innehåll av båda typerna.

@@ -23,10 +23,18 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from itertools import product
+from typing import Callable
 
-from .scorer import Scorer
+from .scorer import Scorer, TalentScore
 
 ROW_UNLOCK_STEP = 5
+
+# Which per-rank values to optimize for. Defaults to the blended score;
+# pass e.g. `lambda s: s.dps_per_rank_values` to solve for the best DPS
+# (or survival/healing) build instead -- everything else about the DP
+# (row-lock, requires, point budget) stays the same regardless.
+ValueSelector = Callable[[TalentScore], list[float]]
+_DEFAULT_VALUE_SELECTOR: ValueSelector = lambda s: s.per_rank_values  # noqa: E731
 
 
 @dataclass(frozen=True)
@@ -36,7 +44,7 @@ class BuildResult:
     ranks: dict[int, int]  # talent_id -> chosen rank, only entries with rank > 0
 
 
-def _row_combos(row_talents: list[dict], scores: dict, budget_cap: int):
+def _row_combos(row_talents: list[dict], scores: dict, budget_cap: int, value_selector: ValueSelector):
     """
     Every valid (added_points, added_value, ranks) combo for one row,
     filtered only by *same-row* requires -- cross-row requires are checked
@@ -65,13 +73,16 @@ def _row_combos(row_talents: list[dict], scores: dict, budget_cap: int):
         if not valid:
             continue
 
-        added_value = sum(sum(scores[tid].per_rank_values[:r]) for tid, r in ranks.items())
+        added_value = sum(sum(value_selector(scores[tid])[:r]) for tid, r in ranks.items())
         combos.append((added_points, round(added_value, 3), ranks))
     return combos
 
 
 def best_builds_for_all_budgets(
-    talents: list[dict], scorer: Scorer, max_points: int = 51
+    talents: list[dict],
+    scorer: Scorer,
+    max_points: int = 51,
+    value_selector: ValueSelector = _DEFAULT_VALUE_SELECTOR,
 ) -> dict[int, BuildResult]:
     """Best achievable build for every point budget 0..max_points, in one pass."""
     scores = {t["id"]: scorer.score_talent(t) for t in talents}
@@ -93,7 +104,7 @@ def best_builds_for_all_budgets(
 
     for row_idx in row_order:
         row_talents = rows[row_idx]
-        combos = _row_combos(row_talents, scores, max_points)
+        combos = _row_combos(row_talents, scores, max_points, value_selector)
         by_id = {t["id"]: t for t in row_talents}
         new_states: dict[tuple, tuple[float, tuple | None]] = {}
 
@@ -163,6 +174,11 @@ def best_builds_for_all_budgets(
     return results
 
 
-def best_build(talents: list[dict], scorer: Scorer, points: int) -> BuildResult:
+def best_build(
+    talents: list[dict],
+    scorer: Scorer,
+    points: int,
+    value_selector: ValueSelector = _DEFAULT_VALUE_SELECTOR,
+) -> BuildResult:
     """Convenience wrapper for a single point budget."""
-    return best_builds_for_all_budgets(talents, scorer, max_points=points)[points]
+    return best_builds_for_all_budgets(talents, scorer, max_points=points, value_selector=value_selector)[points]

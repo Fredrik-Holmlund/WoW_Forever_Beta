@@ -359,12 +359,14 @@ function renderExplainPanel(talent) {
     return;
   }
   const breakdown = talent.score.breakdown || [];
+  const dimLabel = { dps: "DPS", survival: "Survival", healing: "Healing", neutral: "Neutral (alla)" };
   const rows = breakdown
     .map(
       (c) => `
       <tr>
         <td class="eb-label">${escapeHtml(c.label)}</td>
         <td class="eb-matched">"${escapeHtml(c.matched_text)}"</td>
+        <td class="eb-dim eb-dim-${c.dimension}">${dimLabel[c.dimension] || c.dimension}</td>
         <td class="eb-math">${c.value} × ${c.weight} = <b>${c.contribution}</b></td>
       </tr>`
     )
@@ -379,6 +381,12 @@ function renderExplainPanel(talent) {
       talangens ${talent.max_rank} rank(er) (varje rank golvas till minst 0.1 så DP:n
       alltid har ett skäl att överväga poängen) — totalt heuristiskt värde:
       <b>${talent.score.total_value}</b>.
+    </div>
+    <div class="explain-dims">
+      Dimensionstotaler (styr DPS/Surv/Heal-knapparna):
+      <span class="eb-dim-dps">DPS ${talent.score.dps_total_value}</span> ·
+      <span class="eb-dim-survival">Survival ${talent.score.survival_total_value}</span> ·
+      <span class="eb-dim-healing">Healing ${talent.score.healing_total_value}</span>
     </div>
   `;
 }
@@ -599,21 +607,32 @@ function renderTreePanel(cls, specName, tree, showScore) {
   input.min = "0";
   input.max = String(TOTAL_POINTS);
   input.value = "20";
-  const btn = document.createElement("button");
-  btn.textContent = "Fyll automatiskt";
-  btn.title = "Använd scoring-modulens föreslagna build för detta träd, upp till N poäng";
-  btn.addEventListener("click", () => {
+  autofill.appendChild(input);
+
+  const applyAutofill = (buildsKey) => {
     const otherTreesUsed = poolUsed(cls) - treePoints(treeTalents, ranks);
     const maxAllowed = TOTAL_POINTS - otherTreesUsed;
     const desired = Math.max(0, Math.min(parseInt(input.value || "0", 10), maxAllowed));
-    const build = tree.best_builds[desired];
+    const build = tree[buildsKey][desired];
     for (const t of treeTalents) delete ranks[t.id];
     for (const [tid, r] of Object.entries(build.ranks)) ranks[Number(tid)] = r;
     logReplaceTree(cls, treeTalents, ranks);
     render();
-  });
-  autofill.appendChild(input);
-  autofill.appendChild(btn);
+  };
+
+  const AUTOFILL_BUTTONS = [
+    ["Bäst", "best_builds", "Blandad heuristik (samma som poängen som visas på varje talang)"],
+    ["DPS", "best_builds_dps", "Optimerar för skade-relaterade talanger"],
+    ["Surv", "best_builds_survival", "Optimerar för överlevnad/mitigation-talanger"],
+    ["Heal", "best_builds_healing", "Optimerar för heal-relaterade talanger"],
+  ];
+  for (const [label, buildsKey, title] of AUTOFILL_BUTTONS) {
+    const btn = document.createElement("button");
+    btn.textContent = label;
+    btn.title = `${title} — fyller trädet upp till N poäng (fältet till vänster)`;
+    btn.addEventListener("click", () => applyAutofill(buildsKey));
+    autofill.appendChild(btn);
+  }
 
   footer.appendChild(resetBtn);
   footer.appendChild(autofill);

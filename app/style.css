@@ -327,10 +327,11 @@ main {
 
 .tree-footer {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  padding: 0.6rem 0.8rem;
+  gap: 0.4rem;
+  padding: 0.5rem 0.6rem;
   border-top: 1px solid #2a2a2a;
   background: #16171c;
 }
@@ -350,19 +351,20 @@ main {
 
 .autofill {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.35rem;
-  font-size: 0.8rem;
+  gap: 0.25rem;
+  font-size: 0.75rem;
   color: var(--muted);
 }
 
 .autofill input {
-  width: 3rem;
+  width: 2.6rem;
   background: var(--bg);
   color: var(--text);
   border: 1px solid #333;
   border-radius: 4px;
-  padding: 0.2rem 0.3rem;
+  padding: 0.2rem 0.25rem;
 }
 
 .autofill button {
@@ -370,9 +372,9 @@ main {
   color: var(--text);
   border: 1px solid #444;
   border-radius: 4px;
-  padding: 0.2rem 0.5rem;
+  padding: 0.2rem 0.4rem;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.72rem;
 }
 
 .autofill button:hover { background: #383838; }
@@ -500,9 +502,30 @@ main {
 .explain-foot {
   color: var(--muted);
   font-size: 0.75rem;
+  margin-bottom: 0.4rem;
 }
 
 .explain-foot b { color: var(--text); }
+
+.eb-dim {
+  font-size: 0.7rem;
+  white-space: nowrap;
+  padding-right: 0.75rem;
+}
+
+.eb-dim-dps { color: #e0685c; }
+.eb-dim-survival { color: #6699cc; }
+.eb-dim-healing { color: #6bc46b; }
+.eb-dim-neutral { color: var(--muted); }
+
+.explain-dims {
+  font-size: 0.72rem;
+  color: var(--muted);
+  border-top: 1px solid #23262e;
+  padding-top: 0.4rem;
+}
+
+.explain-dims span { font-weight: 600; margin-right: 0.25rem; }
 
 .wh-tooltip {
   position: fixed;
