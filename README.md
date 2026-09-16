@@ -81,6 +81,7 @@ scoring/
   generate_scored_data.py    # kör scoring över data/out/all.json -> app/data/scored.json
 app/
   index.html / app.js / style.css   # statisk UI, läser app/data/scored.json
+  data/scored.json                  # genererad av scoring/generate_scored_data.py, checkas in
 README.md
 ```
 
@@ -122,4 +123,18 @@ grupperat knapsack-DP: talangträdet är litet (max 7 rader × 4 kolumner,
 51 poäng), så brute-force/DP per rad är fullt tillräckligt snabbt. Den
 respekterar både rad-låset (rad *r* kräver ≥5*r* investerade poäng i
 trädet) och `requires`-fältet (specifik talang måste ha ≥ N ranks innan en
-beroende talang kan få poäng).
+beroende talang kan få poäng). Verifierad mot alla 27 träd: poängbudget,
+rad-lås, prerequisites och att värdet aldrig minskar när budgeten ökar
+håller för samtliga.
+
+## UI:t i korthet
+
+- Välj klass + spec, dra i poäng-slidern (0–51) för att se den föreslagna
+  builden ändras live (vit ram = föreslagen rank > 0).
+  Noderna är färgkodade efter talangens heuristiska värde (blått = lågt,
+  orange = högt), och `title`-tooltip på varje nod visar
+  beskrivningstext + heuristikens motivering.
+- Testat manuellt med en headless-browser-smoke test (Playwright mot den
+  förinstallerade Chromium-instansen): sidan laddar utan konsol-/sidfel,
+  alla klasser/specs går att rendera, och slider/checkbox uppdaterar
+  vyn korrekt.
