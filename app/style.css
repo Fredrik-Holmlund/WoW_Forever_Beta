@@ -151,9 +151,10 @@ main {
   position: relative;
   padding: 14px;
   background-image:
-    linear-gradient(rgba(10, 10, 12, 0.72), rgba(10, 10, 12, 0.72)),
+    linear-gradient(rgba(10, 10, 12, 0.55), rgba(10, 10, 12, 0.55)),
     var(--tree-bg, linear-gradient(160deg, #222, #333));
   background-size: cover;
+  background-position: center;
 }
 
 .grid-wrap {

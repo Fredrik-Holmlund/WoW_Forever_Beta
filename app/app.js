@@ -8,6 +8,10 @@
 // data/fetch_talent_icons.py -- any talent without a matching file just
 // falls back to a monogram tile, which is why "icon-img" has an onerror
 // handler below.
+//
+// Tree background art loads from app/backgrounds/<tree_id>.jpg (checked
+// in, one per class/spec). Falls back to a flat per-class CSS gradient
+// (CLASS_THEME below) if a tree_id has no matching file.
 
 const DATA_URL = "data/scored.json";
 const TOTAL_POINTS = 51;
@@ -235,7 +239,8 @@ function renderTreePanel(cls, specName, tree, showScore) {
 
   const body = document.createElement("div");
   body.className = "tree-body";
-  body.style.setProperty("--tree-bg", CLASS_THEME[cls] || "linear-gradient(160deg, #222, #333)");
+  const fallbackGradient = CLASS_THEME[cls] || "linear-gradient(160deg, #222, #333)";
+  body.style.setProperty("--tree-bg", `url('backgrounds/${tree.tree_id}.jpg'), ${fallbackGradient}`);
 
   const gridWrap = document.createElement("div");
   gridWrap.className = "grid-wrap";

@@ -83,6 +83,7 @@ app/
   index.html / app.js / style.css   # statisk UI, läser app/data/scored.json
   data/scored.json                  # genererad av scoring/generate_scored_data.py, checkas in
   icons/                            # talang-ikoner, hämtas lokalt (se nedan) och checkas in
+  backgrounds/<tree_id>.jpg         # bakgrundskonst per träd, checkas in (ett per class/spec)
 README.md
 ```
 
