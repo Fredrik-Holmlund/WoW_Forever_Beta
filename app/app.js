@@ -35,6 +35,8 @@ const scoreToggle = document.getElementById("score-toggle");
 const poolUsedEl = document.getElementById("pool-used");
 const treesEl = document.getElementById("trees");
 
+let tooltipEl = null;
+
 init();
 
 async function init() {
@@ -127,21 +129,79 @@ function monogramFor(name) {
     .toUpperCase();
 }
 
-function buildTooltip(talent, rank) {
-  const shown = rank > 0 ? rank : 1;
-  const desc = talent.descriptions[String(shown)] || "";
-  const req = (talent.requires || []).map((r) => `#${r.id} (rank ${r.qty})`).join(", ");
-  return [
-    `${talent.name} (${rank}/${talent.max_rank})`,
-    desc,
-    `Heuristiskt värde (max rank): ${talent.score.total_value}`,
-    req ? `Kräver: ${req}` : "",
-  ]
-    .filter(Boolean)
-    .join("\n\n");
+function escapeHtml(s) {
+  const div = document.createElement("div");
+  div.textContent = s == null ? "" : s;
+  return div.innerHTML;
+}
+
+// Rich mouseover panel: current rank's effect, a preview of the next rank,
+// which prerequisites are/aren't met yet, and the heuristic score.
+function buildTooltipHTML(talent, rank, treeTalents, ranks) {
+  const byId = {};
+  for (const t of treeTalents) byId[t.id] = t;
+
+  const parts = [];
+  parts.push(
+    `<div class="tt-name">${escapeHtml(talent.name)} <span class="tt-rank">${rank}/${talent.max_rank}</span></div>`
+  );
+
+  if (rank > 0) {
+    parts.push(`<div class="tt-desc">${escapeHtml(talent.descriptions[String(rank)] || "")}</div>`);
+  }
+  if (rank < talent.max_rank) {
+    const nextRank = rank + 1;
+    parts.push(`<div class="tt-next-label">Nästa rank (${nextRank}/${talent.max_rank}):</div>`);
+    parts.push(
+      `<div class="tt-desc tt-dim">${escapeHtml(talent.descriptions[String(nextRank)] || "")}</div>`
+    );
+  }
+
+  if (talent.requires && talent.requires.length) {
+    const items = talent.requires.map((r) => {
+      const reqTalent = byId[r.id];
+      const name = reqTalent ? reqTalent.name : `#${r.id}`;
+      const have = ranks[r.id] || 0;
+      const met = have >= r.qty;
+      return `<span class="${met ? "tt-met" : "tt-unmet"}">${escapeHtml(name)} (${have}/${r.qty})</span>`;
+    });
+    parts.push(`<div class="tt-requires">Kräver: ${items.join(", ")}</div>`);
+  }
+
+  parts.push(`<div class="tt-score">Heuristiskt värde (max rank): ${talent.score.total_value}</div>`);
+
+  return parts.join("");
+}
+
+function showTooltip(evt, html) {
+  if (!tooltipEl) {
+    tooltipEl = document.createElement("div");
+    tooltipEl.className = "wh-tooltip";
+    document.body.appendChild(tooltipEl);
+  }
+  tooltipEl.innerHTML = html;
+  tooltipEl.style.display = "block";
+  positionTooltip(evt);
+}
+
+function positionTooltip(evt) {
+  if (!tooltipEl || tooltipEl.style.display === "none") return;
+  const pad = 18;
+  const rect = tooltipEl.getBoundingClientRect();
+  let x = evt.clientX + pad;
+  let y = evt.clientY + pad;
+  if (x + rect.width > window.innerWidth) x = evt.clientX - rect.width - pad;
+  if (y + rect.height > window.innerHeight) y = evt.clientY - rect.height - pad;
+  tooltipEl.style.left = `${Math.max(4, x)}px`;
+  tooltipEl.style.top = `${Math.max(4, y)}px`;
+}
+
+function hideTooltip() {
+  if (tooltipEl) tooltipEl.style.display = "none";
 }
 
 function render() {
+  hideTooltip(); // nodes are about to be torn down and rebuilt below
   const cls = classSelect.value;
   if (!cls) return;
   const specs = DATA[cls];
@@ -201,7 +261,11 @@ function renderTreePanel(cls, specName, tree, showScore) {
     node.className = "node" + (rank > 0 ? " has-rank" : " rank-zero") + (locked ? " locked" : "");
     node.style.gridColumn = t.col + 1;
     node.style.gridRow = t.row + 1;
-    node.title = buildTooltip(t, rank);
+    node.addEventListener("mouseenter", (e) =>
+      showTooltip(e, buildTooltipHTML(t, rank, treeTalents, ranks))
+    );
+    node.addEventListener("mousemove", positionTooltip);
+    node.addEventListener("mouseleave", hideTooltip);
 
     const img = document.createElement("img");
     img.className = "icon-img";

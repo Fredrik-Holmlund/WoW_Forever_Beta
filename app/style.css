@@ -309,3 +309,61 @@ main {
 }
 
 .autofill button:hover { background: #383838; }
+
+.wh-tooltip {
+  position: fixed;
+  display: none;
+  z-index: 1000;
+  max-width: 300px;
+  background: #14120c;
+  border: 1px solid var(--border-lit);
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--text);
+  pointer-events: none;
+}
+
+.wh-tooltip .tt-name {
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.wh-tooltip .tt-rank {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 0.75rem;
+}
+
+.wh-tooltip .tt-desc {
+  color: #c9d8b0;
+  margin-bottom: 6px;
+}
+
+.wh-tooltip .tt-dim {
+  color: #8a9478;
+}
+
+.wh-tooltip .tt-next-label {
+  color: var(--muted);
+  font-size: 0.72rem;
+  margin-bottom: 2px;
+}
+
+.wh-tooltip .tt-requires {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.wh-tooltip .tt-met { color: #7fbf6a; }
+.wh-tooltip .tt-unmet { color: #c0442e; }
+
+.wh-tooltip .tt-score {
+  margin-top: 4px;
+  color: #6699cc;
+  font-size: 0.72rem;
+}

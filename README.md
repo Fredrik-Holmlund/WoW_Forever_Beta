@@ -82,7 +82,7 @@ scoring/
 app/
   index.html / app.js / style.css   # statisk UI, läser app/data/scored.json
   data/scored.json                  # genererad av scoring/generate_scored_data.py, checkas in
-  icons/                            # talang-ikoner, hämtas lokalt (se nedan), INTE checkat in
+  icons/                            # talang-ikoner, hämtas lokalt (se nedan) och checkas in
 README.md
 ```
 
@@ -97,9 +97,21 @@ python3 data/fetch_talent_icons.py          # hämtar talang-ikoner till app/ico
 `fetch_talent_icons.py` kunde inte köras i den sandboxade miljön det här
 projektet byggdes i — dess nätverkspolicy blockerar både `wowhead.com` och
 ikon-CDN:et `wow.zamimg.com` (testat direkt, inte bara antaget). Kör den
-själv lokalt där du har vanlig internetåtkomst. Tills dess (eller om en
-enskild ikon saknas/har fel filnamn) visar UI:t en enkel bokstavsplatshållare
-istället — inget kraschar, det ser bara mindre snyggt ut.
+själv lokalt där du har vanlig internetåtkomst, och committa in resultatet:
+
+```bash
+python3 data/fetch_talent_icons.py
+git add app/icons
+git commit -m "Add talent icons"
+git push
+```
+
+Ikonerna checkas in (de är inte gitignorade) så UI:t fungerar direkt för
+alla som klonar repot, utan att behöva köra scriptet själva. Notera att det
+är Blizzards spelgrafik, inte din egen — vanlig praxis för fan-verktyg,
+men värt att känna till om du gör repot publikt. Om en enskild ikon saknas
+eller har fel filnamn visar UI:t en bokstavsplatshållare istället — inget
+kraschar, det ser bara mindre snyggt ut.
 
 ## Köra UI:t
 
