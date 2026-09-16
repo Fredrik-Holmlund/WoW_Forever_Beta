@@ -82,6 +82,7 @@ scoring/
 app/
   index.html / app.js / style.css   # statisk UI, läser app/data/scored.json
   data/scored.json                  # genererad av scoring/generate_scored_data.py, checkas in
+  icons/                            # talang-ikoner, hämtas lokalt (se nedan), INTE checkat in
 README.md
 ```
 
@@ -90,7 +91,15 @@ README.md
 ```bash
 python3 data/fetch_forever_talents.py       # uppdaterar data/out/*.json (kräver nätåtkomst)
 python3 scoring/generate_scored_data.py     # skriver app/data/scored.json
+python3 data/fetch_talent_icons.py          # hämtar talang-ikoner till app/icons/ (kräver nätåtkomst)
 ```
+
+`fetch_talent_icons.py` kunde inte köras i den sandboxade miljön det här
+projektet byggdes i — dess nätverkspolicy blockerar både `wowhead.com` och
+ikon-CDN:et `wow.zamimg.com` (testat direkt, inte bara antaget). Kör den
+själv lokalt där du har vanlig internetåtkomst. Tills dess (eller om en
+enskild ikon saknas/har fel filnamn) visar UI:t en enkel bokstavsplatshållare
+istället — inget kraschar, det ser bara mindre snyggt ut.
 
 ## Köra UI:t
 
@@ -102,6 +111,16 @@ cd app
 python3 -m http.server 8000
 # öppna http://localhost:8000
 ```
+
+UI:t visar alla tre specs för vald klass sida vid sida, som den riktiga
+talent-kalkylatorn: klicka (vänster) på en talang för att lägga en poäng,
+högerklicka för att ta bort en. Poäng delas mellan de tre träden (51 totalt
+per klass), rad-låset och `requires` respekteras — ett klick som skulle
+bryta mot reglerna gör helt enkelt ingenting. Linjerna mellan noder visar
+prerequisite-kopplingar (guld = uppfylld, grå = inte än). Varje träd har en
+"Fyll automatiskt"-knapp som applicerar scoring-modulens förslag för valfritt
+antal poäng, och en "Visa heuristiskt värde"-toggle som lägger på en liten
+sifferbadge per talang.
 
 ## Scoring — hur det fungerar (och hur du byter ut det)
 
@@ -129,12 +148,14 @@ håller för samtliga.
 
 ## UI:t i korthet
 
-- Välj klass + spec, dra i poäng-slidern (0–51) för att se den föreslagna
-  builden ändras live (vit ram = föreslagen rank > 0).
-  Noderna är färgkodade efter talangens heuristiska värde (blått = lågt,
-  orange = högt), och `title`-tooltip på varje nod visar
-  beskrivningstext + heuristikens motivering.
+- Välj klass, se alla tre specs samtidigt (som den riktiga kalkylatorn).
+  Vänsterklick lägger till en poäng, högerklick tar bort en — rad-lås,
+  `requires` och den delade 51-poängsbudgeten respekteras alltid.
+  `title`-tooltip på varje nod visar beskrivningstext, heuristiskt värde
+  och ev. prerequisites.
+- Ikoner laddas från `app/icons/<slug>.jpg` med en bokstavsplatshållare
+  som fallback (se ovan om varför de inte är checkade in).
 - Testat manuellt med en headless-browser-smoke test (Playwright mot den
-  förinstallerade Chromium-instansen): sidan laddar utan konsol-/sidfel,
-  alla klasser/specs går att rendera, och slider/checkbox uppdaterar
-  vyn korrekt.
+  förinstallerade Chromium-instansen): klick/högerklick, cascade-borttagning
+  av beroende talanger, "Fyll automatiskt", Reset och score-togglen
+  verifierades alla fungera utan konsol-/sidfel.
