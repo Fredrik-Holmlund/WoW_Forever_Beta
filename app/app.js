@@ -209,7 +209,7 @@ function render() {
   const showScore = scoreToggle.checked;
 
   treesEl.innerHTML = "";
-  for (const specName of Object.keys(specs)) {
+  for (const specName of Object.keys(specs).sort()) {
     const { el, draw } = renderTreePanel(cls, specName, specs[specName], showScore);
     treesEl.appendChild(el);
     draw(); // must run after the panel is attached to the DOM, or offsetWidth/Height read 0
