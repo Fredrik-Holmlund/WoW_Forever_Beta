@@ -1,0 +1,924 @@
+{
+  "Combat": {
+    "tree_id": 181,
+    "talents": [
+      {
+        "id": 105708,
+        "name": "Improved Eviscerate",
+        "row": 0,
+        "col": 0,
+        "icon": "ability_rogue_eviscerate",
+        "max_rank": 3,
+        "descriptions": {
+          "1": "Increases the damage done by your Eviscerate ability by 7%.",
+          "2": "Increases the damage done by your Eviscerate ability by 13%.",
+          "3": "Increases the damage done by your Eviscerate ability by 20%."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105741,
+        "name": "Improved Sinister Strike",
+        "row": 0,
+        "col": 1,
+        "icon": "spell_shadow_ritualofsacrifice",
+        "max_rank": 2,
+        "descriptions": {
+          "1": "Reduces the Energy cost of your Sinister Strike ability by 3.",
+          "2": "Reduces the Energy cost of your Sinister Strike ability by 5."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 113398,
+        "name": "Lightning Reflexes",
+        "row": 0,
+        "col": 2,
+        "icon": "spell_nature_invisibilty",
+        "max_rank": 5,
+        "descriptions": {
+          "1": "Increases your Dodge chance by 1%.",
+          "2": "Increases your Dodge chance by 2%.",
+          "3": "Increases your Dodge chance by 3%.",
+          "4": "Increases your Dodge chance by 4%.",
+          "5": "Increases your Dodge chance by 5%."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105719,
+        "name": "Puncturing Wounds",
+        "row": 1,
+        "col": 0,
+        "icon": "ability_backstab",
+        "max_rank": 3,
+        "descriptions": {
+          "1": "Increases the critical strike chance of your Backstab by 10% and your Mutilate by 5%, and gives Backstab a 15% chance to add an additional Combo Point.",
+          "2": "Increases the critical strike chance of your Backstab by 20% and your Mutilate by 10%, and gives Backstab a 30% chance to add an additional Combo Point.",
+          "3": "Increases the critical strike chance of your Backstab by 30% and your Mutilate by 15%, and gives Backstab a 45% chance to add an additional Combo Point."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105738,
+        "name": "Deflection",
+        "row": 1,
+        "col": 1,
+        "icon": "ability_parry",
+        "max_rank": 3,
+        "descriptions": {
+          "1": "Increases your Parry chance by 2%.",
+          "2": "Increases your Parry chance by 4%.",
+          "3": "Increases your Parry chance by 6%."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105737,
+        "name": "Precision",
+        "row": 1,
+        "col": 2,
+        "icon": "ability_marksmanship",
+        "max_rank": 3,
+        "descriptions": {
+          "1": "Increases your chance to hit with all attacks and Poisons by 1%.",
+          "2": "Increases your chance to hit with all attacks and Poisons by 2%.",
+          "3": "Increases your chance to hit with all attacks and Poisons by 3%."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105736,
+        "name": "Endurance",
+        "row": 2,
+        "col": 0,
+        "icon": "spell_shadow_shadowward",
+        "max_rank": 2,
+        "descriptions": {
+          "1": "Reduces the cooldown of your Sprint and Evasion abilities by 30%.",
+          "2": "Reduces the cooldown of your Sprint and Evasion abilities by 60%."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105735,
+        "name": "Riposte",
+        "row": 2,
+        "col": 1,
+        "icon": "ability_warrior_challange",
+        "max_rank": 1,
+        "descriptions": {
+          "1": "A strike that becomes active after parrying an opponent's attack.  This attack deals 150% weapon damage and disarms the target for 6 sec."
+        },
+        "requires": [
+          {
+            "id": 105738,
+            "qty": 3
+          }
+        ],
+        "requires_text": null,
+        "cost": [
+          "10 Energy",
+          "Melee Range",
+          "Instant",
+          "6 sec cooldown"
+        ]
+      },
+      {
+        "id": 105732,
+        "name": "Improved Sprint",
+        "row": 2,
+        "col": 3,
+        "icon": "ability_rogue_sprint",
+        "max_rank": 2,
+        "descriptions": {
+          "1": "Gives a 50% chance to remove all movement impairing effects when you activate your Sprint ability.",
+          "2": "Gives a 100% chance to remove all movement impairing effects when you activate your Sprint ability."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105733,
+        "name": "Improved Kick",
+        "row": 3,
+        "col": 0,
+        "icon": "ability_kick",
+        "max_rank": 2,
+        "descriptions": {
+          "1": "Gives your Kick ability a 50% chance to Silence the target for 2 sec.",
+          "2": "Gives your Kick ability a 100% chance to Silence the target for 2 sec."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 108100,
+        "name": "Restless Blades",
+        "row": 3,
+        "col": 1,
+        "icon": "ability_rogue_restlessblades",
+        "max_rank": 1,
+        "descriptions": {
+          "1": "Your damaging finishing moves reduce the remaining cooldown of your Adrenaline Rush, Blade Flurry, Evasion, Sprint, and Vanish abilities by 2 sec per combo point."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105740,
+        "name": "Dual Wield Specialization",
+        "row": 3,
+        "col": 2,
+        "icon": "ability_dualwield",
+        "max_rank": 5,
+        "descriptions": {
+          "1": "Increases the damage done by your off-hand weapon by 5%.",
+          "2": "Increases the damage done by your off-hand weapon by 10%.",
+          "3": "Increases the damage done by your off-hand weapon by 15%.",
+          "4": "Increases the damage done by your off-hand weapon by 20%.",
+          "5": "Increases the damage done by your off-hand weapon by 25%."
+        },
+        "requires": [
+          {
+            "id": 105737,
+            "qty": 3
+          }
+        ],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105728,
+        "name": "Blade Flurry",
+        "row": 4,
+        "col": 1,
+        "icon": "ability_warrior_punishingblow",
+        "max_rank": 1,
+        "descriptions": {
+          "1": "Increases your melee attack speed by 20% and your melee attacks strike an additional nearby opponent. Lasts 15 sec."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": [
+          "25 Energy",
+          "Instant",
+          "2 min cooldown"
+        ]
+      },
+      {
+        "id": 105727,
+        "name": "Hack and Slash",
+        "row": 4,
+        "col": 2,
+        "icon": "inv_sword_27",
+        "max_rank": 5,
+        "descriptions": {
+          "1": "Gives your melee weapon attacks a benefit depending on the weapon.\n\n    Axe/Sword: Your successful\n    melee attacks have a 1% chance\n    to trigger an extra attack on the \n    target.\n\n    Dagger/Fist: Increases your\n    critical strike chance by 1%.\n\n    Mace: Your attacks ignore 3% of\n    your target's armor.",
+          "2": "Gives your melee weapon attacks a benefit depending on the weapon.\n\n    Axe/Sword: Your successful\n    melee attacks have a 2% chance\n    to trigger an extra attack on the \n    target.\n\n    Dagger/Fist: Increases your\n    critical strike chance by 2%.\n\n    Mace: Your attacks ignore 6% of\n    your target's armor.",
+          "3": "Gives your melee weapon attacks a benefit depending on the weapon.\n\n    Axe/Sword: Your successful\n    melee attacks have a 3% chance\n    to trigger an extra attack on the \n    target.\n\n    Dagger/Fist: Increases your\n    critical strike chance by 3%.\n\n    Mace: Your attacks ignore 9% of\n    your target's armor.",
+          "4": "Gives your melee weapon attacks a benefit depending on the weapon.\n\n    Axe/Sword: Your successful\n    melee attacks have a 4% chance\n    to trigger an extra attack on the \n    target.\n\n    Dagger/Fist: Increases your\n    critical strike chance by 4%.\n\n    Mace: Your attacks ignore 12% of\n    your target's armor.",
+          "5": "Gives your melee weapon attacks a benefit depending on the weapon.\n\n    Axe/Sword: Your successful\n    melee attacks have a 5% chance\n    to trigger an extra attack on the \n    target.\n\n    Dagger/Fist: Increases your\n    critical strike chance by 5%.\n\n    Mace: Your attacks ignore 15% of\n    your target's armor."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105726,
+        "name": "Weapon Expertise",
+        "row": 5,
+        "col": 1,
+        "icon": "spell_holy_blessingofstrength",
+        "max_rank": 2,
+        "descriptions": {
+          "1": "Reduces the chance for your attacks to be Dodged or Parried by 1%.",
+          "2": "Reduces the chance for your attacks to be Dodged or Parried by 2%."
+        },
+        "requires": [
+          {
+            "id": 105728,
+            "qty": 1
+          }
+        ],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105730,
+        "name": "Aggression",
+        "row": 5,
+        "col": 2,
+        "icon": "ability_racial_avatar",
+        "max_rank": 3,
+        "descriptions": {
+          "1": "Increases the damage of your Sinister Strike, Backstab, and Eviscerate abilities by 2%.",
+          "2": "Increases the damage of your Sinister Strike, Backstab, and Eviscerate abilities by 4%.",
+          "3": "Increases the damage of your Sinister Strike, Backstab, and Eviscerate abilities by 6%."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105724,
+        "name": "Adrenaline Rush",
+        "row": 6,
+        "col": 1,
+        "icon": "spell_shadow_shadowworddominate",
+        "max_rank": 1,
+        "descriptions": {
+          "1": "Increases your Energy regeneration rate by 100% for 15 sec."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": [
+          "Instant",
+          "5 min cooldown"
+        ]
+      }
+    ]
+  },
+  "Assassination": {
+    "tree_id": 182,
+    "talents": [
+      {
+        "id": 105742,
+        "name": "Improved Gouge",
+        "row": 0,
+        "col": 0,
+        "icon": "ability_gouge",
+        "max_rank": 3,
+        "descriptions": {
+          "1": "Increases the duration of your Gouge ability by 0.5 sec.",
+          "2": "Increases the duration of your Gouge ability by 1 sec.",
+          "3": "Increases the duration of your Gouge ability by 1.5 sec."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105723,
+        "name": "Remorseless Attacks",
+        "row": 0,
+        "col": 1,
+        "icon": "ability_fiegndead",
+        "max_rank": 2,
+        "descriptions": {
+          "1": "After killing a non-trivial enemy, gives you a 20% increased critical strike chance on your next Sinister Strike, Backstab, Ambush, Mutilate, or Ghostly Strike. Lasts 20 sec.",
+          "2": "After killing a non-trivial enemy, gives you a 40% increased critical strike chance on your next Sinister Strike, Backstab, Ambush, Mutilate, or Ghostly Strike. Lasts 20 sec."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105722,
+        "name": "Malice",
+        "row": 0,
+        "col": 2,
+        "icon": "ability_racial_bloodrage",
+        "max_rank": 5,
+        "descriptions": {
+          "1": "Increases your critical strike chance with all attacks and Poisons by 1%.",
+          "2": "Increases your critical strike chance with all attacks and Poisons by 2%.",
+          "3": "Increases your critical strike chance with all attacks and Poisons by 3%.",
+          "4": "Increases your critical strike chance with all attacks and Poisons by 4%.",
+          "5": "Increases your critical strike chance with all attacks and Poisons by 5%."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105721,
+        "name": "Ruthlessness",
+        "row": 1,
+        "col": 0,
+        "icon": "ability_druid_disembowel",
+        "max_rank": 3,
+        "descriptions": {
+          "1": "Gives your finishing moves a 20% chance to add a Combo Point to your target.",
+          "2": "Gives your finishing moves a 40% chance to add a Combo Point to your target.",
+          "3": "Gives your finishing moves a 60% chance to add a Combo Point to your target."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105720,
+        "name": "Murder",
+        "row": 1,
+        "col": 1,
+        "icon": "spell_shadow_deathscream",
+        "max_rank": 2,
+        "descriptions": {
+          "1": "Increases all damage dealt by 2% against Humanoid and Giant targets.",
+          "2": "Increases all damage dealt by 4% against Humanoid and Giant targets."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105739,
+        "name": "Improved Slice and Dice",
+        "row": 1,
+        "col": 3,
+        "icon": "ability_rogue_slicedice",
+        "max_rank": 3,
+        "descriptions": {
+          "1": "Increases the duration of your Slice and Dice ability by 15%.",
+          "2": "Increases the duration of your Slice and Dice ability by 30%.",
+          "3": "Increases the duration of your Slice and Dice ability by 45%."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105759,
+        "name": "Relentless Strikes",
+        "row": 2,
+        "col": 0,
+        "icon": "ability_warrior_decisivestrike",
+        "max_rank": 1,
+        "descriptions": {
+          "1": "Your finishing moves have a 20% chance per Combo Point to restore 25 Energy."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105717,
+        "name": "Improved Expose Armor",
+        "row": 2,
+        "col": 1,
+        "icon": "ability_warrior_riposte",
+        "max_rank": 2,
+        "descriptions": {
+          "1": "Reduces the Energy cost of your Expose Armor ability by 5, and refunds 1 Combo Point when cast with 5 Combo Points.",
+          "2": "Reduces the Energy cost of your Expose Armor ability by 10, and refunds 2 Combo Points when cast with 5 Combo Points."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105716,
+        "name": "Lethality",
+        "row": 2,
+        "col": 2,
+        "icon": "ability_criticalstrike",
+        "max_rank": 5,
+        "descriptions": {
+          "1": "Increases the critical strike damage bonus of your Sinister Strike, Gouge, Backstab, Mutilate, Ghostly Strike, and Hemorrhage abilities by 6%.",
+          "2": "Increases the critical strike damage bonus of your Sinister Strike, Gouge, Backstab, Mutilate, Ghostly Strike, and Hemorrhage abilities by 12%.",
+          "3": "Increases the critical strike damage bonus of your Sinister Strike, Gouge, Backstab, Mutilate, Ghostly Strike, and Hemorrhage abilities by 18%.",
+          "4": "Increases the critical strike damage bonus of your Sinister Strike, Gouge, Backstab, Mutilate, Ghostly Strike, and Hemorrhage abilities by 24%.",
+          "5": "Increases the critical strike damage bonus of your Sinister Strike, Gouge, Backstab, Mutilate, Ghostly Strike, and Hemorrhage abilities by 30%."
+        },
+        "requires": [
+          {
+            "id": 105722,
+            "qty": 5
+          }
+        ],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105714,
+        "name": "Vile Poisons",
+        "row": 3,
+        "col": 0,
+        "icon": "ability_rogue_feigndeath",
+        "max_rank": 5,
+        "descriptions": {
+          "1": "Increases the damage dealt by your poisons by 4% and gives your poisons an additional 8% chance to resist dispel effects.",
+          "2": "Increases the damage dealt by your poisons by 8% and gives your poisons an additional 16% chance to resist dispel effects.",
+          "3": "Increases the damage dealt by your poisons by 12% and gives your poisons an additional 24% chance to resist dispel effects.",
+          "4": "Increases the damage dealt by your poisons by 16% and gives your poisons an additional 32% chance to resist dispel effects.",
+          "5": "Increases the damage dealt by your poisons by 20% and gives your poisons an additional 40% chance to resist dispel effects."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105715,
+        "name": "Cold Blood",
+        "row": 3,
+        "col": 1,
+        "icon": "spell_ice_lament",
+        "max_rank": 1,
+        "descriptions": {
+          "1": "When activated, increases the critical strike chance of your next Sinister Strike, Backstab, Ambush, Eviscerate, or Mutilate by 100%."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": [
+          "Instant",
+          "3 min cooldown"
+        ]
+      },
+      {
+        "id": 105713,
+        "name": "Improved Poisons",
+        "row": 3,
+        "col": 2,
+        "icon": "ability_poisons",
+        "max_rank": 5,
+        "descriptions": {
+          "1": "Increases the chance to apply Poisons to your target by 2%, and gives Poison applications a 10% chance to not consume a charge.",
+          "2": "Increases the chance to apply Poisons to your target by 4%, and gives Poison applications a 20% chance to not consume a charge.",
+          "3": "Increases the chance to apply Poisons to your target by 6%, and gives Poison applications a 30% chance to not consume a charge.",
+          "4": "Increases the chance to apply Poisons to your target by 8%, and gives Poison applications a 40% chance to not consume a charge.",
+          "5": "Increases the chance to apply Poisons to your target by 10%, and gives Poison applications a 50% chance to not consume a charge."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105718,
+        "name": "Vigor",
+        "row": 4,
+        "col": 0,
+        "icon": "spell_nature_earthbindtotem",
+        "max_rank": 2,
+        "descriptions": {
+          "1": "Increases your maximum Energy by 5.",
+          "2": "Increases your maximum Energy by 10."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105709,
+        "name": "Mutilate",
+        "row": 4,
+        "col": 1,
+        "icon": "ability_rogue_deadlybrew",
+        "max_rank": 1,
+        "descriptions": {
+          "1": "Instantly attacks with both weapons for 75% weapon damage plus an additional 13 with each weapon. Damage increased by 20% against Poisoned targets. Awards 2 Combo Points."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": [
+          "60 Energy",
+          "Melee Range",
+          "Instant"
+        ]
+      },
+      {
+        "id": 105711,
+        "name": "Improved Kidney Shot",
+        "row": 4,
+        "col": 2,
+        "icon": "ability_rogue_kidneyshot",
+        "max_rank": 2,
+        "descriptions": {
+          "1": "Enemies Stunned by your Kidney Shot ability take 5% increased damage from your poisons and attacks.",
+          "2": "Enemies Stunned by your Kidney Shot ability take 10% increased damage from your poisons and attacks."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105710,
+        "name": "Seal Fate",
+        "row": 5,
+        "col": 2,
+        "icon": "spell_shadow_chilltouch",
+        "max_rank": 5,
+        "descriptions": {
+          "1": "Your critical strikes from abilities that add Combo Points have a 20% chance to add an additional Combo Point.",
+          "2": "Your critical strikes from abilities that add Combo Points have a 40% chance to add an additional Combo Point.",
+          "3": "Your critical strikes from abilities that add Combo Points have a 60% chance to add an additional Combo Point.",
+          "4": "Your critical strikes from abilities that add Combo Points have a 80% chance to add an additional Combo Point.",
+          "5": "Your critical strikes from abilities that add Combo Points have a 100% chance to add an additional Combo Point."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105712,
+        "name": "Venom",
+        "row": 6,
+        "col": 1,
+        "icon": "inv_sword_31",
+        "max_rank": 1,
+        "descriptions": {
+          "1": "Finishing move that increases the damage of your Poisons by 30% and your chance to apply Poisons by 10%. Lasts longer per combo point:\n   1 point: 9 seconds\n   2 points: 12 seconds\n   3 points: 15 seconds\n   4 points: 18 seconds\n   5 points: 21 seconds"
+        },
+        "requires": [
+          {
+            "id": 105709,
+            "qty": 1
+          }
+        ],
+        "requires_text": null,
+        "cost": [
+          "25 Energy",
+          "1 to 5 Combo Points",
+          "Instant"
+        ]
+      }
+    ]
+  },
+  "Subtlety": {
+    "tree_id": 183,
+    "talents": [
+      {
+        "id": 105756,
+        "name": "Camouflage",
+        "row": 0,
+        "col": 0,
+        "icon": "ability_stealth",
+        "max_rank": 5,
+        "descriptions": {
+          "1": "Reduces your speed penalty from your Stealth ability by 3% and reduces its cooldown by 2 sec.",
+          "2": "Reduces your speed penalty from your Stealth ability by 6% and reduces its cooldown by 3 sec.",
+          "3": "Reduces your speed penalty from your Stealth ability by 9% and reduces its cooldown by 4 sec.",
+          "4": "Reduces your speed penalty from your Stealth ability by 12% and reduces its cooldown by 5 sec.",
+          "5": "Reduces your speed penalty from your Stealth ability by 15% and reduces its cooldown by 6 sec."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105761,
+        "name": "Master of Deception",
+        "row": 0,
+        "col": 1,
+        "icon": "spell_shadow_charm",
+        "max_rank": 3,
+        "descriptions": {
+          "1": "Reduces the chance enemies have to detect you while in Stealth mode as if you were 1 level higher.",
+          "2": "Reduces the chance enemies have to detect you while in Stealth mode as if you were 2 levels higher.",
+          "3": "Reduces the chance enemies have to detect you while in Stealth mode as if you were 3 levels higher."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105760,
+        "name": "Opportunity",
+        "row": 0,
+        "col": 2,
+        "icon": "ability_warrior_warcry",
+        "max_rank": 2,
+        "descriptions": {
+          "1": "Increases the damage dealt by your Backstab, Garrote, Ambush, and Mutilate abilities by 5%.",
+          "2": "Increases the damage dealt by your Backstab, Garrote, Ambush, and Mutilate abilities by 10%."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105751,
+        "name": "Setup",
+        "row": 1,
+        "col": 0,
+        "icon": "spell_nature_mirrorimage",
+        "max_rank": 3,
+        "descriptions": {
+          "1": "Gives you a 33% chance to add a Combo Point to your target after Dodging an attack or fully resisting a spell.",
+          "2": "Gives you a 67% chance to add a Combo Point to your target after Dodging an attack or fully resisting a spell.",
+          "3": "Gives you a 100% chance to add a Combo Point to your target after Dodging an attack or fully resisting a spell."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105753,
+        "name": "Elusiveness",
+        "row": 1,
+        "col": 1,
+        "icon": "spell_magic_lesserinvisibilty",
+        "max_rank": 2,
+        "descriptions": {
+          "1": "Reduces the cooldown of your Vanish and Blind abilities by 45 sec.",
+          "2": "Reduces the cooldown of your Vanish and Blind abilities by 1.5 min."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105757,
+        "name": "Dirty Tricks",
+        "row": 1,
+        "col": 2,
+        "icon": "ability_sap",
+        "max_rank": 2,
+        "descriptions": {
+          "1": "Reduces the Energy cost of your Sap and Blind abilities by 25%.",
+          "2": "Reduces the Energy cost of your Sap and Blind abilities by 50%."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105749,
+        "name": "Improved Ambush",
+        "row": 1,
+        "col": 3,
+        "icon": "ability_rogue_ambush",
+        "max_rank": 3,
+        "descriptions": {
+          "1": "Increases the critical strike chance of your Ambush ability by 15%.",
+          "2": "Increases the critical strike chance of your Ambush ability by 30%.",
+          "3": "Increases the critical strike chance of your Ambush ability by 45%."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105755,
+        "name": "Initiative",
+        "row": 2,
+        "col": 0,
+        "icon": "spell_shadow_fumble",
+        "max_rank": 3,
+        "descriptions": {
+          "1": "Gives you a 33% chance to add an additional combo point to your target when using your Ambush, Garrote, or Cheap Shot ability.",
+          "2": "Gives you a 67% chance to add an additional combo point to your target when using your Ambush, Garrote, or Cheap Shot ability.",
+          "3": "Gives you a 100% chance to add an additional combo point to your target when using your Ambush, Garrote, or Cheap Shot ability."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105754,
+        "name": "Ghostly Strike",
+        "row": 2,
+        "col": 1,
+        "icon": "spell_shadow_curse",
+        "max_rank": 1,
+        "descriptions": {
+          "1": "A strike that deals 125% (180% if a Dagger is equipped in your Main Hand) weapon damage and increases your chance to dodge by 15% for 7 sec. Awards 1 combo point."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": [
+          "40 Energy",
+          "Melee Range",
+          "Instant",
+          "20 sec cooldown"
+        ]
+      },
+      {
+        "id": 110868,
+        "name": "Improved Distract",
+        "row": 2,
+        "col": 2,
+        "icon": "ability_rogue_distract",
+        "max_rank": 2,
+        "descriptions": {
+          "1": "Increases the radius of your Distract ability by 3 yds, and further reduces the Stealth detection of distracted enemies as though they were an additional 1 level lower.",
+          "2": "Increases the radius of your Distract ability by 5 yds, and further reduces the Stealth detection of distracted enemies as though they were an additional 2 levels lower."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105747,
+        "name": "Heightened Senses",
+        "row": 3,
+        "col": 0,
+        "icon": "ability_ambush",
+        "max_rank": 2,
+        "descriptions": {
+          "1": "Increases your Stealth detection as if you were 1 level higher and reduces your chance to be hit by spells and ranged attacks by 2%.",
+          "2": "Increases your Stealth detection as if you were 3 levels higher and reduces your chance to be hit by spells and ranged attacks by 4%."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105743,
+        "name": "Premeditation",
+        "row": 3,
+        "col": 1,
+        "icon": "spell_shadow_possession",
+        "max_rank": 1,
+        "descriptions": {
+          "1": "Adds 2 Combo Points to your target.  You must add to or use those combo points within 20 sec or the combo points are lost."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": [
+          "20 yd range",
+          "Instant",
+          "2 min cooldown"
+        ]
+      },
+      {
+        "id": 105752,
+        "name": "Serrated Blades",
+        "row": 3,
+        "col": 2,
+        "icon": "inv_sword_17",
+        "max_rank": 3,
+        "descriptions": {
+          "1": "Causes your attacks to ignore 3% of your target's Armor and increases the damage dealt by your Rupture ability by 10%.",
+          "2": "Causes your attacks to ignore 6% of your target's Armor and increases the damage dealt by your Rupture ability by 20%.",
+          "3": "Causes your attacks to ignore 9% of your target's Armor and increases the damage dealt by your Rupture ability by 30%."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105745,
+        "name": "Dirty Deeds",
+        "row": 4,
+        "col": 0,
+        "icon": "spell_shadow_summonsuccubus",
+        "max_rank": 2,
+        "descriptions": {
+          "1": "Reduces the Energy cost of your Cheap Shot and Garrote abilities by 10, and your Garrote ability no longer requires you to be behind your target.",
+          "2": "Reduces the Energy cost of your Cheap Shot and Garrote abilities by 20, and your Garrote ability no longer requires you to be behind your target."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105746,
+        "name": "Preparation",
+        "row": 4,
+        "col": 1,
+        "icon": "spell_shadow_antishadow",
+        "max_rank": 1,
+        "descriptions": {
+          "1": "When activated, this ability immediately finishes the cooldown on your other Rogue abilities."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": [
+          "Instant",
+          "10 min cooldown"
+        ]
+      },
+      {
+        "id": 105748,
+        "name": "Hemorrhage",
+        "row": 4,
+        "col": 2,
+        "icon": "spell_shadow_lifedrain",
+        "max_rank": 1,
+        "descriptions": {
+          "1": "An instant strike that deals 100% weapon damage (145% if a Dagger is equipped) and causes the target to take 15% increased Rupture damage from the Rogue. Lasts 15 sec. Awards 1 Combo Point."
+        },
+        "requires": [
+          {
+            "id": 105752,
+            "qty": 3
+          }
+        ],
+        "requires_text": null,
+        "cost": [
+          "35 Energy",
+          "Melee Range",
+          "Instant"
+        ]
+      },
+      {
+        "id": 110867,
+        "name": "Quietus",
+        "row": 5,
+        "col": 0,
+        "icon": "ability_rogue_garrote",
+        "max_rank": 5,
+        "descriptions": {
+          "1": "Your Sinister Strike, Ghostly Strike, and Hemorrhage abilities cause 2% more damage against targets below 35% health.",
+          "2": "Your Sinister Strike, Ghostly Strike, and Hemorrhage abilities cause 4% more damage against targets below 35% health.",
+          "3": "Your Sinister Strike, Ghostly Strike, and Hemorrhage abilities cause 6% more damage against targets below 35% health.",
+          "4": "Your Sinister Strike, Ghostly Strike, and Hemorrhage abilities cause 8% more damage against targets below 35% health.",
+          "5": "Your Sinister Strike, Ghostly Strike, and Hemorrhage abilities cause 10% more damage against targets below 35% health."
+        },
+        "requires": [
+          {
+            "id": 105745,
+            "qty": 2
+          }
+        ],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 105750,
+        "name": "Cutthroat",
+        "row": 5,
+        "col": 2,
+        "icon": "classicon_rogue",
+        "max_rank": 5,
+        "descriptions": {
+          "1": "Your Backstab has a 3% chance to cause your next Ambush within 10 sec to not require Stealth.",
+          "2": "Your Backstab has a 6% chance to cause your next Ambush within 10 sec to not require Stealth.",
+          "3": "Your Backstab has a 9% chance to cause your next Ambush within 10 sec to not require Stealth.",
+          "4": "Your Backstab has a 12% chance to cause your next Ambush within 10 sec to not require Stealth.",
+          "5": "Your Backstab has a 15% chance to cause your next Ambush within 10 sec to not require Stealth."
+        },
+        "requires": [],
+        "requires_text": null,
+        "cost": null
+      },
+      {
+        "id": 110866,
+        "name": "Thousand Cuts",
+        "row": 6,
+        "col": 1,
+        "icon": "ability_rogue_rupture",
+        "max_rank": 1,
+        "descriptions": {
+          "1": "When your Rupture ability deals periodic damage, the Energy cost of your next Hemorrhage or Backstab ability within 10 sec is reduced by 3, stacking up to 5 times."
+        },
+        "requires": [
+          {
+            "id": 105746,
+            "qty": 1
+          }
+        ],
+        "requires_text": null,
+        "cost": null
+      }
+    ]
+  }
+}
