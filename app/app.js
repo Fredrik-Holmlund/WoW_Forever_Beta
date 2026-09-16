@@ -54,7 +54,10 @@ async function init() {
     classSelect.appendChild(opt);
   }
 
-  classSelect.addEventListener("change", render);
+  classSelect.addEventListener("change", () => {
+    hideTooltip(); // switching class replaces every tree; don't leave a stale tooltip up
+    render();
+  });
   scoreToggle.addEventListener("change", render);
 
   document.getElementById("loading").classList.add("hidden");
@@ -177,7 +180,15 @@ function buildTooltipHTML(talent, rank, treeTalents, ranks) {
   return parts.join("");
 }
 
-function showTooltip(evt, html) {
+// The node the mouse is currently over, kept across re-renders (add/remove
+// rank, autofill, reset all tear down and rebuild every node) so the
+// tooltip stays open and its content updates live instead of needing a
+// mouseleave+mouseenter to refresh.
+let hoveredTalent = null; // { talent, treeTalents, ranks }
+let lastMouseX = 0;
+let lastMouseY = 0;
+
+function showTooltipAt(html, x, y) {
   if (!tooltipEl) {
     tooltipEl = document.createElement("div");
     tooltipEl.className = "wh-tooltip";
@@ -185,27 +196,34 @@ function showTooltip(evt, html) {
   }
   tooltipEl.innerHTML = html;
   tooltipEl.style.display = "block";
-  positionTooltip(evt);
+  positionTooltipAt(x, y);
 }
 
-function positionTooltip(evt) {
+function positionTooltipAt(x, y) {
   if (!tooltipEl || tooltipEl.style.display === "none") return;
   const pad = 18;
   const rect = tooltipEl.getBoundingClientRect();
-  let x = evt.clientX + pad;
-  let y = evt.clientY + pad;
-  if (x + rect.width > window.innerWidth) x = evt.clientX - rect.width - pad;
-  if (y + rect.height > window.innerHeight) y = evt.clientY - rect.height - pad;
-  tooltipEl.style.left = `${Math.max(4, x)}px`;
-  tooltipEl.style.top = `${Math.max(4, y)}px`;
+  let px = x + pad;
+  let py = y + pad;
+  if (px + rect.width > window.innerWidth) px = x - rect.width - pad;
+  if (py + rect.height > window.innerHeight) py = y - rect.height - pad;
+  tooltipEl.style.left = `${Math.max(4, px)}px`;
+  tooltipEl.style.top = `${Math.max(4, py)}px`;
+}
+
+function refreshHoveredTooltip() {
+  if (!hoveredTalent) return;
+  const { talent, treeTalents, ranks } = hoveredTalent;
+  const rank = ranks[talent.id] || 0;
+  showTooltipAt(buildTooltipHTML(talent, rank, treeTalents, ranks), lastMouseX, lastMouseY);
 }
 
 function hideTooltip() {
+  hoveredTalent = null;
   if (tooltipEl) tooltipEl.style.display = "none";
 }
 
 function render() {
-  hideTooltip(); // nodes are about to be torn down and rebuilt below
   const cls = classSelect.value;
   if (!cls) return;
   const specs = DATA[cls];
@@ -218,6 +236,12 @@ function render() {
     treesEl.appendChild(el);
     draw(); // must run after the panel is attached to the DOM, or offsetWidth/Height read 0
   }
+
+  // Nodes were just torn down and rebuilt: if the mouse is still resting on
+  // the talent it was hovering (e.g. after a click added/removed a rank),
+  // re-show the tooltip immediately with fresh content instead of leaving
+  // it stale or requiring a mouseleave+mouseenter to update it.
+  refreshHoveredTooltip();
 }
 
 function renderTreePanel(cls, specName, tree, showScore) {
@@ -266,11 +290,20 @@ function renderTreePanel(cls, specName, tree, showScore) {
     node.className = "node" + (rank > 0 ? " has-rank" : " rank-zero") + (locked ? " locked" : "");
     node.style.gridColumn = t.col + 1;
     node.style.gridRow = t.row + 1;
-    node.addEventListener("mouseenter", (e) =>
-      showTooltip(e, buildTooltipHTML(t, rank, treeTalents, ranks))
-    );
-    node.addEventListener("mousemove", positionTooltip);
-    node.addEventListener("mouseleave", hideTooltip);
+    node.addEventListener("mouseenter", (e) => {
+      hoveredTalent = { talent: t, treeTalents, ranks };
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+      showTooltipAt(buildTooltipHTML(t, ranks[t.id] || 0, treeTalents, ranks), e.clientX, e.clientY);
+    });
+    node.addEventListener("mousemove", (e) => {
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+      positionTooltipAt(e.clientX, e.clientY);
+    });
+    node.addEventListener("mouseleave", () => {
+      if (hoveredTalent && hoveredTalent.talent.id === t.id) hideTooltip();
+    });
 
     const img = document.createElement("img");
     img.className = "icon-img";
