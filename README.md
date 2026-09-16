@@ -84,6 +84,7 @@ app/
   data/scored.json                  # genererad av scoring/generate_scored_data.py, checkas in
   icons/                            # talang-ikoner, hämtas lokalt (se nedan) och checkas in
   backgrounds/<tree_id>.jpg         # bakgrundskonst per träd, checkas in (ett per class/spec)
+  class_icons/ , spec_icons/        # klass- och spec-ikoner för väljaren/header, checkas in
 README.md
 ```
 

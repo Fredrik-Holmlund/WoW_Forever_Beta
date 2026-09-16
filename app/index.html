@@ -20,20 +20,27 @@
 <main>
   <div id="loading">Laddar data...</div>
   <div id="app" class="hidden">
+    <div class="class-picker" id="class-picker"></div>
+
     <section class="toolbar">
-      <label>
-        Klass
-        <select id="class-select"></select>
-      </label>
+      <div class="search-box">
+        <input type="search" id="search-input" placeholder="Sök talang...">
+      </div>
       <label class="checkbox-control">
         <input type="checkbox" id="score-toggle">
         Visa heuristiskt värde
       </label>
-      <div class="pool-indicator">Totalt spenderat: <span id="pool-used">0</span> / 51</div>
+      <div class="points-summary" id="points-summary"></div>
       <div class="hint">Vänsterklick = lägg till poäng · Högerklick = ta bort</div>
     </section>
 
-    <section id="trees" class="trees"></section>
+    <div class="workspace">
+      <section id="trees" class="trees"></section>
+      <aside class="talent-order">
+        <h3>Talent Order</h3>
+        <ol id="talent-order-list"></ol>
+      </aside>
+    </div>
   </div>
 </main>
 

@@ -29,15 +29,71 @@ const CLASS_THEME = {
   Paladin: "linear-gradient(160deg, #3b3b1b, #5a5a2d)",
 };
 
+// class_icons/ and spec_icons/ are checked in (see README). Spec icons are
+// keyed by tree_id, not name, since Wowhead's own spec names don't always
+// match the ones we derive in TREE_NAME_MAP (e.g. "Elemental Combat" vs
+// "Elemental") -- tree_id is the stable join key we already use elsewhere.
+const CLASS_ICON = {
+  Druid: "class_icons/class_druid.jpg",
+  Hunter: "class_icons/class_hunter.jpg",
+  Mage: "class_icons/class_mage.jpg",
+  Paladin: "class_icons/class_paladin.jpg",
+  Priest: "class_icons/class_priest.jpg",
+  Rogue: "class_icons/class_rogue.jpg",
+  Shaman: "class_icons/class_shaman.jpg",
+  Warlock: "class_icons/class_warlock.jpg",
+  Warrior: "class_icons/class_warrior.jpg",
+};
+
+const SPEC_ICON_BY_TREE_ID = {
+  41: "spec_icons/spell_fire_firebolt02.jpg",
+  61: "spec_icons/spell_frost_frostbolt02.jpg",
+  81: "spec_icons/spell_holy_magicalsentry.jpg",
+  161: "spec_icons/ability_rogue_eviscerate.jpg",
+  163: "spec_icons/ability_warrior_defensivestance.jpg",
+  164: "spec_icons/ability_warrior_innerrage.jpg",
+  181: "spec_icons/ability_backstab.jpg",
+  182: "spec_icons/ability_rogue_eviscerate.jpg",
+  183: "spec_icons/ability_stealth.jpg",
+  201: "spec_icons/spell_holy_wordfortitude.jpg",
+  202: "spec_icons/spell_holy_holybolt.jpg",
+  203: "spec_icons/spell_shadow_shadowwordpain.jpg",
+  261: "spec_icons/spell_nature_lightning.jpg",
+  262: "spec_icons/spell_nature_magicimmunity.jpg",
+  263: "spec_icons/spell_nature_lightningshield.jpg",
+  281: "spec_icons/ability_racial_bearform.jpg",
+  282: "spec_icons/spell_nature_healingtouch.jpg",
+  283: "spec_icons/spell_nature_starfall.jpg",
+  301: "spec_icons/spell_shadow_rainoffire.jpg",
+  302: "spec_icons/spell_shadow_deathcoil.jpg",
+  303: "spec_icons/spell_shadow_metamorphosis.jpg",
+  361: "spec_icons/ability_hunter_beasttaming.jpg",
+  362: "spec_icons/ability_hunter_swiftstrike.jpg",
+  363: "spec_icons/ability_marksmanship.jpg",
+  381: "spec_icons/spell_holy_auraoflight.jpg",
+  382: "spec_icons/spell_holy_holybolt.jpg",
+  383: "spec_icons/spell_holy_devotionaura.jpg",
+};
+
 let DATA = null;
 // { className: { talentId: rank } }
 const ranksByClass = {};
+// { className: [{ talentId, name, icon, rank }, ...] } -- chronological log
+// of point spends, across all 3 trees of that class, for the Talent Order
+// panel. Rebuilt entry-by-entry as ranks change (see logAdd/logRemoveOne/
+// logClear/logReplaceTree below) rather than derived from ranksByClass,
+// since a rank map alone can't tell you the order points were spent in.
+const orderByClass = {};
 let svgUidCounter = 0;
+let currentClass = null;
+let searchQuery = "";
 
-const classSelect = document.getElementById("class-select");
+const classPickerEl = document.getElementById("class-picker");
 const scoreToggle = document.getElementById("score-toggle");
-const poolUsedEl = document.getElementById("pool-used");
+const searchInput = document.getElementById("search-input");
+const pointsSummaryEl = document.getElementById("points-summary");
 const treesEl = document.getElementById("trees");
+const orderListEl = document.getElementById("talent-order-list");
 
 let tooltipEl = null;
 
@@ -47,18 +103,35 @@ async function init() {
   const res = await fetch(DATA_URL);
   DATA = await res.json();
 
-  for (const cls of Object.keys(DATA).sort()) {
-    const opt = document.createElement("option");
-    opt.value = cls;
-    opt.textContent = cls;
-    classSelect.appendChild(opt);
+  const classes = Object.keys(DATA).sort();
+  for (const cls of classes) {
+    const btn = document.createElement("button");
+    btn.className = "class-btn";
+    btn.title = cls;
+    btn.dataset.class = cls;
+    const img = document.createElement("img");
+    img.src = CLASS_ICON[cls] || "";
+    img.alt = cls;
+    img.addEventListener("error", () => {
+      img.style.display = "none";
+      btn.textContent = cls.slice(0, 2).toUpperCase();
+    });
+    btn.appendChild(img);
+    btn.addEventListener("click", () => {
+      if (currentClass === cls) return;
+      hideTooltip(); // switching class replaces every tree; don't leave a stale tooltip up
+      currentClass = cls;
+      render();
+    });
+    classPickerEl.appendChild(btn);
   }
+  currentClass = classes[0];
 
-  classSelect.addEventListener("change", () => {
-    hideTooltip(); // switching class replaces every tree; don't leave a stale tooltip up
+  scoreToggle.addEventListener("change", render);
+  searchInput.addEventListener("input", () => {
+    searchQuery = searchInput.value.trim().toLowerCase();
     render();
   });
-  scoreToggle.addEventListener("change", render);
 
   document.getElementById("loading").classList.add("hidden");
   document.getElementById("app").classList.remove("hidden");
@@ -68,6 +141,52 @@ async function init() {
 function poolUsed(cls) {
   const ranks = ranksByClass[cls] || {};
   return Object.values(ranks).reduce((a, b) => a + b, 0);
+}
+
+// --- Talent Order log --------------------------------------------------
+
+function logAdd(cls, talent, rank) {
+  orderByClass[cls] = orderByClass[cls] || [];
+  orderByClass[cls].push({ talentId: talent.id, name: talent.name, icon: talent.icon, rank });
+}
+
+// Removes the most recent log entry for this talent (mirrors removeRank,
+// which always removes the highest currently-held rank).
+function logRemoveOne(cls, talentId) {
+  const log = orderByClass[cls];
+  if (!log) return;
+  for (let i = log.length - 1; i >= 0; i--) {
+    if (log[i].talentId === talentId) {
+      log.splice(i, 1);
+      return;
+    }
+  }
+}
+
+// Removes every log entry for a talent (mirrors clearTalent's cascade wipe).
+function logClearTalent(cls, talentId) {
+  const log = orderByClass[cls];
+  if (!log) return;
+  orderByClass[cls] = log.filter((e) => e.talentId !== talentId);
+}
+
+function logClearTree(cls, treeTalents) {
+  const log = orderByClass[cls];
+  if (!log) return;
+  const ids = new Set(treeTalents.map((t) => t.id));
+  orderByClass[cls] = log.filter((e) => !ids.has(e.talentId));
+}
+
+// Autofill doesn't spend points one at a time, so there's no real "order"
+// to log -- approximate one deterministically (top-to-bottom, left-to-right
+// through the tree) so the panel still shows something sensible.
+function logReplaceTree(cls, treeTalents, ranks) {
+  logClearTree(cls, treeTalents);
+  const sorted = [...treeTalents].sort((a, b) => a.row - b.row || a.col - b.col);
+  for (const t of sorted) {
+    const rank = ranks[t.id] || 0;
+    for (let r = 1; r <= rank; r++) logAdd(cls, t, r);
+  }
 }
 
 function pointsInTreeBelowRow(treeTalents, ranks, row) {
@@ -91,36 +210,40 @@ function canAdd(talent, treeTalents, ranks, poolRemaining) {
   return true;
 }
 
-function clearTalent(talent, treeTalents, ranks) {
+function clearTalent(talent, treeTalents, ranks, cls) {
   const cur = ranks[talent.id] || 0;
   if (cur === 0) return;
   delete ranks[talent.id];
+  logClearTalent(cls, talent.id);
   for (const t2 of treeTalents) {
     for (const req of t2.requires || []) {
       if (req.id === talent.id && req.qty > 0) {
-        clearTalent(t2, treeTalents, ranks);
+        clearTalent(t2, treeTalents, ranks, cls);
       }
     }
   }
 }
 
-function addRank(talent, treeTalents, ranks) {
-  ranks[talent.id] = (ranks[talent.id] || 0) + 1;
+function addRank(talent, treeTalents, ranks, cls) {
+  const newRank = (ranks[talent.id] || 0) + 1;
+  ranks[talent.id] = newRank;
+  logAdd(cls, talent, newRank);
 }
 
-function removeRank(talent, treeTalents, ranks) {
+function removeRank(talent, treeTalents, ranks, cls) {
   const cur = ranks[talent.id] || 0;
   if (cur <= 0) return;
   const newRank = cur - 1;
   for (const t2 of treeTalents) {
     for (const req of t2.requires || []) {
       if (req.id === talent.id && req.qty > newRank) {
-        clearTalent(t2, treeTalents, ranks);
+        clearTalent(t2, treeTalents, ranks, cls);
       }
     }
   }
   if (newRank <= 0) delete ranks[talent.id];
   else ranks[talent.id] = newRank;
+  logRemoveOne(cls, talent.id);
 }
 
 function isRowLocked(treeTalents, ranks, row) {
@@ -224,24 +347,66 @@ function hideTooltip() {
 }
 
 function render() {
-  const cls = classSelect.value;
+  const cls = currentClass;
   if (!cls) return;
   const specs = DATA[cls];
-  poolUsedEl.textContent = poolUsed(cls);
-  const showScore = scoreToggle.checked;
+  const specNames = Object.keys(specs).sort();
 
+  for (const btn of classPickerEl.children) {
+    btn.classList.toggle("selected", btn.dataset.class === cls);
+  }
+
+  const perTree = specNames.map((name) => treePoints(specs[name].talents, ranksByClass[cls] || {}));
+  const remaining = TOTAL_POINTS - poolUsed(cls);
+  pointsSummaryEl.innerHTML = `${perTree.join("/")} &nbsp; Points left: <b>${remaining}</b>`;
+
+  const showScore = scoreToggle.checked;
   treesEl.innerHTML = "";
-  for (const specName of Object.keys(specs).sort()) {
+  for (const specName of specNames) {
     const { el, draw } = renderTreePanel(cls, specName, specs[specName], showScore);
     treesEl.appendChild(el);
     draw(); // must run after the panel is attached to the DOM, or offsetWidth/Height read 0
   }
+
+  renderTalentOrder(cls);
 
   // Nodes were just torn down and rebuilt: if the mouse is still resting on
   // the talent it was hovering (e.g. after a click added/removed a rank),
   // re-show the tooltip immediately with fresh content instead of leaving
   // it stale or requiring a mouseleave+mouseenter to update it.
   refreshHoveredTooltip();
+}
+
+function renderTalentOrder(cls) {
+  const log = orderByClass[cls] || [];
+  orderListEl.innerHTML = "";
+  if (log.length === 0) {
+    const li = document.createElement("li");
+    li.className = "to-empty";
+    li.textContent = "Inga poäng spenderade än.";
+    orderListEl.appendChild(li);
+    return;
+  }
+  log.forEach((entry, i) => {
+    const li = document.createElement("li");
+    const idx = document.createElement("span");
+    idx.className = "to-index";
+    idx.textContent = String(i + 1);
+    const icon = document.createElement("img");
+    icon.className = "to-icon";
+    icon.src = `icons/${entry.icon}.jpg`;
+    icon.alt = "";
+    icon.addEventListener("error", () => (icon.style.visibility = "hidden"));
+    const name = document.createElement("span");
+    name.className = "to-name";
+    name.textContent = entry.name;
+    const rank = document.createElement("span");
+    rank.className = "to-rank";
+    rank.textContent = `Rank ${entry.rank}`;
+    li.append(idx, icon, name, rank);
+    orderListEl.appendChild(li);
+  });
+  orderListEl.parentElement.scrollTop = orderListEl.parentElement.scrollHeight;
 }
 
 function renderTreePanel(cls, specName, tree, showScore) {
@@ -254,11 +419,28 @@ function renderTreePanel(cls, specName, tree, showScore) {
 
   const header = document.createElement("div");
   header.className = "tree-header";
-  header.innerHTML = `
-    <div class="tree-icon">${monogramFor(specName)}</div>
-    <div class="tree-name">${specName}</div>
-    <div class="tree-points">${treePoints(treeTalents, ranks)} / ${TOTAL_POINTS}</div>
-  `;
+  const treeIcon = document.createElement("div");
+  treeIcon.className = "tree-icon";
+  const specIconPath = SPEC_ICON_BY_TREE_ID[tree.tree_id];
+  if (specIconPath) {
+    const specImg = document.createElement("img");
+    specImg.src = specIconPath;
+    specImg.alt = specName;
+    specImg.addEventListener("error", () => {
+      specImg.remove();
+      treeIcon.textContent = monogramFor(specName);
+    });
+    treeIcon.appendChild(specImg);
+  } else {
+    treeIcon.textContent = monogramFor(specName);
+  }
+  const nameEl = document.createElement("div");
+  nameEl.className = "tree-name";
+  nameEl.textContent = specName;
+  const pointsEl = document.createElement("div");
+  pointsEl.className = "tree-points";
+  pointsEl.textContent = `${treePoints(treeTalents, ranks)} / ${TOTAL_POINTS}`;
+  header.append(treeIcon, nameEl, pointsEl);
   panel.appendChild(header);
 
   const body = document.createElement("div");
@@ -277,8 +459,8 @@ function renderTreePanel(cls, specName, tree, showScore) {
   grid.className = "grid";
   const maxRow = Math.max(...treeTalents.map((t) => t.row));
   const maxCol = Math.max(...treeTalents.map((t) => t.col));
-  grid.style.gridTemplateColumns = `repeat(${maxCol + 1}, 56px)`;
-  grid.style.gridTemplateRows = `repeat(${maxRow + 1}, 56px)`;
+  grid.style.gridTemplateColumns = `repeat(${maxCol + 1}, 40px)`;
+  grid.style.gridTemplateRows = `repeat(${maxRow + 1}, 40px)`;
 
   const nodeEls = {};
 
@@ -286,8 +468,13 @@ function renderTreePanel(cls, specName, tree, showScore) {
     const rank = ranks[t.id] || 0;
     const locked = isRowLocked(treeTalents, ranks, t.row) && rank === 0;
 
+    let searchClass = "";
+    if (searchQuery) {
+      searchClass = t.name.toLowerCase().includes(searchQuery) ? " search-match" : " search-dim";
+    }
     const node = document.createElement("div");
-    node.className = "node" + (rank > 0 ? " has-rank" : " rank-zero") + (locked ? " locked" : "");
+    node.className =
+      "node" + (rank > 0 ? " has-rank" : " rank-zero") + (locked ? " locked" : "") + searchClass;
     node.style.gridColumn = t.col + 1;
     node.style.gridRow = t.row + 1;
     node.addEventListener("mouseenter", (e) => {
@@ -335,14 +522,14 @@ function renderTreePanel(cls, specName, tree, showScore) {
     node.addEventListener("click", () => {
       const remaining = TOTAL_POINTS - poolUsed(cls);
       if (!locked && canAdd(t, treeTalents, ranks, remaining)) {
-        addRank(t, treeTalents, ranks);
+        addRank(t, treeTalents, ranks, cls);
         render();
       }
     });
     node.addEventListener("contextmenu", (e) => {
       e.preventDefault();
       if (rank > 0) {
-        removeRank(t, treeTalents, ranks);
+        removeRank(t, treeTalents, ranks, cls);
         render();
       }
     });
@@ -363,6 +550,7 @@ function renderTreePanel(cls, specName, tree, showScore) {
   resetBtn.textContent = "✕ Reset";
   resetBtn.addEventListener("click", () => {
     for (const t of treeTalents) delete ranks[t.id];
+    logClearTree(cls, treeTalents);
     render();
   });
 
@@ -383,6 +571,7 @@ function renderTreePanel(cls, specName, tree, showScore) {
     const build = tree.best_builds[desired];
     for (const t of treeTalents) delete ranks[t.id];
     for (const [tid, r] of Object.entries(build.ranks)) ranks[Number(tid)] = r;
+    logReplaceTree(cls, treeTalents, ranks);
     render();
   });
   autofill.appendChild(input);
